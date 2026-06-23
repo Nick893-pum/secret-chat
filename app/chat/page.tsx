@@ -26,22 +26,26 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    socket.on("message-history", (history) => {
-  setMessages(history);
-});
-    socket.on("new-message", (data: Message) => {
-      setMessages((prev) => [...prev, data]);
-    });
+  console.log(
+    "Socket URL:",
+    process.env.NEXT_PUBLIC_SOCKET_URL
+  );
 
-    socket.on("room-users", (data: User[]) => {
-      setUsers(data);
-    });
+  socket.connect();
 
-    return () => {
-      socket.off("new-message");
-      socket.off("room-users");
-    };
-  }, []);
+  socket.on("connect", () => {
+    console.log("CONNECTED", socket.id);
+  });
+
+  socket.on("connect_error", (err) => {
+    console.error("CONNECT ERROR", err);
+  });
+
+  return () => {
+    socket.off("connect");
+    socket.off("connect_error");
+  };
+}, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
