@@ -50,12 +50,16 @@ export default function ChatPage() {
 
     // Receive new messages
     socket.on("new-message", (newMessage) => {
-  console.log("NEW MESSAGE EVENT", newMessage);
+  console.log(
+    "NEW MESSAGE EVENT",
+    JSON.stringify(newMessage)
+  );
 
-  setMessages((prev) => [
-    ...prev,
-    newMessage,
-  ]);
+  setMessages((prev) => {
+    console.log("UPDATING STATE");
+
+    return [...prev, newMessage];
+  });
 });
 
     // Receive user list
