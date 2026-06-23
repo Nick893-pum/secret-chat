@@ -29,45 +29,65 @@ io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
 socket.on("join-room", async ({ username, roomCode }) => {
-  socket.join(roomCode);
+  try {
+    console.log("JOIN ROOM:", {
+      username,
+      roomCode,
+      socketId: socket.id,
+    });
 
-  socket.data.username = username;
-  socket.data.roomCode = roomCode;
+    socket.join(roomCode);
 
-  if (!rooms[roomCode]) {
-    rooms[roomCode] = [];
-  }
+    socket.data.username = username;
+    socket.data.roomCode = roomCode;
 
-  rooms[roomCode].push({
-    id: socket.id,
-    username,
-  });
+    if (!rooms[roomCode]) {
+      rooms[roomCode] = [];
+    }
 
-  const room = await prisma.room.findUnique({
-    where: {
-      code: roomCode,
-    },
-    include: {
-      messages: {
-        orderBy: {
-          createdAt: "asc",
-        },
-        take: 100,
+    const existingUser = rooms[roomCode].find(
+      (u) => u.id === socket.id
+    );
+
+    if (!existingUser) {
+      rooms[roomCode].push({
+        id: socket.id,
+        username,
+      });
+    }
+
+    const room = await prisma.room.findUnique({
+      where: {
+        code: roomCode,
       },
-    },
-  });
+      include: {
+        messages: {
+          orderBy: {
+            createdAt: "asc",
+          },
+          take: 100,
+        },
+      },
+    });
 
-  socket.emit(
-    "message-history",
-    room?.messages || []
-  );
+    socket.emit(
+      "message-history",
+      room?.messages || []
+    );
 
-  io.to(roomCode).emit(
-    "room-users",
-    rooms[roomCode]
-  );
+    io.to(roomCode).emit(
+      "room-users",
+      rooms[roomCode]
+    );
 
-  console.log(`${username} joined ${roomCode}`);
+    // IMPORTANT
+    socket.emit("join-success");
+
+    console.log(`${username} joined ${roomCode}`);
+  } catch (error) {
+    console.error("JOIN ROOM ERROR");
+    console.error(error);
+  }
 });
 
   socket.on("send-message", async (text) => {
@@ -82,10 +102,12 @@ socket.on("join-room", async ({ username, roomCode }) => {
     });
 
     if (!roomCode || !username) {
-      throw new Error(
-        "Missing roomCode or username on socket.data"
-      );
-    }
+  console.log(
+    "Message rejected: user has not joined room yet"
+  );
+
+  return;
+}
 
     const room = await prisma.room.upsert({
       where: {

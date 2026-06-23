@@ -64,12 +64,18 @@ export default function ChatPage() {
       setUsers(roomUsers);
     });
 
+    socket.on("join-success", () => {
+  console.log("JOIN SUCCESS");
+  setJoined(true);
+});
+
     return () => {
       socket.off("connect");
       socket.off("connect_error");
       socket.off("message-history");
       socket.off("new-message");
       socket.off("room-users");
+      socket.off("join-success");
     };
   }, []);
 
@@ -81,18 +87,18 @@ export default function ChatPage() {
   }, [messages]);
 
   function joinRoom() {
-    if (!username.trim() || !roomCode.trim()) {
-      alert("Please enter your name and room code.");
-      return;
-    }
-
-    socket.emit("join-room", {
-      username: username.trim(),
-      roomCode: roomCode.trim().toUpperCase(),
-    });
-
-    setJoined(true);
+  if (!username.trim() || !roomCode.trim()) {
+    alert("Please enter your name and room code.");
+    return;
   }
+
+  console.log("Joining room...");
+
+  socket.emit("join-room", {
+    username: username.trim(),
+    roomCode: roomCode.trim().toUpperCase(),
+  });
+}
 
   function sendMessage() {
     if (!message.trim()) return;
