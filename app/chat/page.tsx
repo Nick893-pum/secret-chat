@@ -56,7 +56,10 @@ export default function ChatPage() {
   );
 
   setMessages((prev) => {
-    console.log("UPDATING STATE");
+    console.log(
+      "UPDATING MESSAGES",
+      prev.length
+    );
 
     return [...prev, newMessage];
   });

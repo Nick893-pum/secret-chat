@@ -143,14 +143,16 @@ socket.on("join-room", async ({ username, roomCode }) => {
   message
 );
 console.log(
-  "ROOM MEMBERS:",
-  roomCode,
-  io.sockets.adapter.rooms.get(roomCode)
+  "EMITTING TO ROOM:",
+  roomCode
 );
-io.to(roomCode).emit(
-  "new-message",
-  message
-);
+
+io.to(roomCode).emit("new-message", {
+  id: message.id,
+  username: message.username,
+  text: message.text,
+  createdAt: message.createdAt.toISOString(),
+});
   } catch (error) {
     console.error("SEND MESSAGE ERROR:");
     console.error(error);
