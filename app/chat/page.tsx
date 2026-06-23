@@ -44,19 +44,19 @@ export default function ChatPage() {
 
     // Receive old messages
     socket.on("message-history", (history) => {
-      console.log("History received:", history);
-      setMessages(history);
-    });
+  console.log("MESSAGE HISTORY", history);
+  setMessages(history);
+});
 
     // Receive new messages
     socket.on("new-message", (newMessage) => {
-      console.log("New message:", newMessage);
+  console.log("NEW MESSAGE EVENT", newMessage);
 
-      setMessages((prev) => [
-        ...prev,
-        newMessage,
-      ]);
-    });
+  setMessages((prev) => [
+    ...prev,
+    newMessage,
+  ]);
+});
 
     // Receive user list
     socket.on("room-users", (roomUsers) => {

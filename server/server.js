@@ -137,7 +137,16 @@ socket.on("join-room", async ({ username, roomCode }) => {
 
     console.log("Message saved:", message);
 
-    io.to(roomCode).emit("new-message", message);
+    console.log(
+  "EMITTING TO ROOM:",
+  roomCode,
+  message
+);
+
+io.to(roomCode).emit(
+  "new-message",
+  message
+);
   } catch (error) {
     console.error("SEND MESSAGE ERROR:");
     console.error(error);
