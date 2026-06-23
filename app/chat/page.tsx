@@ -25,28 +25,55 @@ export default function ChatPage() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Socket connection
   useEffect(() => {
-  console.log(
-    "Socket URL:",
-    process.env.NEXT_PUBLIC_SOCKET_URL
-  );
+    console.log(
+      "Socket URL:",
+      process.env.NEXT_PUBLIC_SOCKET_URL
+    );
 
-  socket.connect();
+    socket.connect();
 
-  socket.on("connect", () => {
-    console.log("CONNECTED", socket.id);
-  });
+    socket.on("connect", () => {
+      console.log("CONNECTED", socket.id);
+    });
 
-  socket.on("connect_error", (err) => {
-    console.error("CONNECT ERROR", err);
-  });
+    socket.on("connect_error", (err) => {
+      console.error("CONNECT ERROR", err);
+    });
 
-  return () => {
-    socket.off("connect");
-    socket.off("connect_error");
-  };
-}, []);
+    // Receive old messages
+    socket.on("message-history", (history) => {
+      console.log("History received:", history);
+      setMessages(history);
+    });
 
+    // Receive new messages
+    socket.on("new-message", (newMessage) => {
+      console.log("New message:", newMessage);
+
+      setMessages((prev) => [
+        ...prev,
+        newMessage,
+      ]);
+    });
+
+    // Receive user list
+    socket.on("room-users", (roomUsers) => {
+      console.log("Users:", roomUsers);
+      setUsers(roomUsers);
+    });
+
+    return () => {
+      socket.off("connect");
+      socket.off("connect_error");
+      socket.off("message-history");
+      socket.off("new-message");
+      socket.off("room-users");
+    };
+  }, []);
+
+  // Auto scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
       behavior: "smooth",
@@ -57,10 +84,6 @@ export default function ChatPage() {
     if (!username.trim() || !roomCode.trim()) {
       alert("Please enter your name and room code.");
       return;
-    }
-
-    if (!socket.connected) {
-      socket.connect();
     }
 
     socket.emit("join-room", {
@@ -74,7 +97,10 @@ export default function ChatPage() {
   function sendMessage() {
     if (!message.trim()) return;
 
-    socket.emit("send-message", message.trim());
+    socket.emit(
+      "send-message",
+      message.trim()
+    );
 
     setMessage("");
   }
@@ -100,7 +126,9 @@ export default function ChatPage() {
             className="w-full border rounded p-3 mb-4"
             placeholder="Your name"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) =>
+              setUsername(e.target.value)
+            }
           />
 
           <input
@@ -108,12 +136,14 @@ export default function ChatPage() {
             placeholder="Room code"
             value={roomCode}
             onChange={(e) =>
-              setRoomCode(e.target.value.toUpperCase())
+              setRoomCode(
+                e.target.value.toUpperCase()
+              )
             }
           />
 
           <button
-            className="w-full bg-blue-600 text-white rounded p-3 hover:bg-blue-700"
+            className="w-full bg-blue-600 text-white rounded p-3"
             onClick={joinRoom}
           >
             Join Room
@@ -127,13 +157,15 @@ export default function ChatPage() {
     <div className="min-h-screen p-4">
       <div className="max-w-5xl mx-auto">
         <div className="flex flex-col md:flex-row gap-4">
-          {/* Sidebar */}
+
           <div className="w-full md:w-64 border rounded-lg p-4">
             <h2 className="text-xl font-bold mb-2">
               Room: {roomCode}
             </h2>
 
-            <p className="mb-4">Welcome, {username}</p>
+            <p className="mb-4">
+              Welcome, {username}
+            </p>
 
             <h3 className="font-semibold mb-2">
               Online ({users.length})
@@ -148,20 +180,18 @@ export default function ChatPage() {
             </ul>
 
             <button
-              className="w-full bg-red-500 text-white rounded p-2 hover:bg-red-600"
+              className="w-full bg-red-500 text-white rounded p-2"
               onClick={leaveRoom}
             >
               Leave Room
             </button>
           </div>
 
-          {/* Chat Area */}
           <div className="flex-1 border rounded-lg p-4 flex flex-col h-[80vh]">
+
             <div className="flex-1 overflow-y-auto space-y-3 mb-4">
               {messages.length === 0 ? (
-                <p className="text-gray-500">
-                  No messages yet.
-                </p>
+                <p>No messages yet.</p>
               ) : (
                 messages.map((msg, index) => (
                   <div
@@ -169,9 +199,11 @@ export default function ChatPage() {
                     className="border rounded p-3"
                   >
                     <div className="flex justify-between mb-1">
-                      <strong>{msg.username}</strong>
+                      <strong>
+                        {msg.username}
+                      </strong>
 
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs">
                         {new Date(
                           msg.createdAt
                         ).toLocaleTimeString()}
@@ -189,8 +221,8 @@ export default function ChatPage() {
             <div className="flex gap-2">
               <input
                 className="flex-1 border rounded p-3"
-                placeholder="Type a message..."
                 value={message}
+                placeholder="Type a message..."
                 onChange={(e) =>
                   setMessage(e.target.value)
                 }
@@ -202,12 +234,13 @@ export default function ChatPage() {
               />
 
               <button
-                className="bg-green-600 text-white rounded px-6 hover:bg-green-700"
+                className="bg-green-600 text-white rounded px-6"
                 onClick={sendMessage}
               >
                 Send
               </button>
             </div>
+
           </div>
         </div>
       </div>
