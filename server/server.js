@@ -21,12 +21,18 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
     credentials: true,
   },
+  transports: ["websocket", "polling"],
 });
 
 const rooms = {};
 
 io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+  console.log(
+    "User connected:",
+    socket.id,
+    "Transport:",
+    socket.conn.transport.name
+  );
 
 socket.on("join-room", async ({ username, roomCode }) => {
   try {
