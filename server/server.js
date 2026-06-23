@@ -142,7 +142,11 @@ socket.on("join-room", async ({ username, roomCode }) => {
   roomCode,
   message
 );
-
+console.log(
+  "ROOM MEMBERS:",
+  roomCode,
+  io.sockets.adapter.rooms.get(roomCode)
+);
 io.to(roomCode).emit(
   "new-message",
   message
