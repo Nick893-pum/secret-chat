@@ -228,10 +228,8 @@ console.log(
                       </strong>
 
                       <span className="text-xs">
-                        {new Date(
-                          msg.createdAt
-                        ).toLocaleTimeString()}
-                      </span>
+  {String(msg.createdAt)}
+</span>
                     </div>
 
                     <p>{msg.text}</p>
