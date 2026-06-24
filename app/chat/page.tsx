@@ -22,10 +22,24 @@ export default function ChatPage() {
 
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+useEffect(() => {
+  console.log(
+    "MESSAGES STATE CHANGED:",
+    messages.length,
+    messages
+  );
+}, [messages]);
   const [users, setUsers] = useState<User[]>([]);
-
+  const [debugLogs, setDebugLogs] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  function addLog(msg: string) {
+  console.log(msg);
 
+  setDebugLogs((prev) => [
+    ...prev.slice(-30),
+    `${new Date().toLocaleTimeString()} | ${msg}`,
+  ]);
+}
   // ==========================
   // SOCKET INIT
   // ==========================
@@ -175,6 +189,11 @@ export default function ChatPage() {
   // LOGIN PAGE
   // ==========================
   if (!joined) {
+    console.log(
+  "RENDER CHAT",
+  messages.length,
+  users.length
+);
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-md border rounded-lg p-6 shadow">
@@ -261,7 +280,11 @@ export default function ChatPage() {
 
           {/* CHAT */}
           <div className="flex-1 border rounded-lg p-4 flex flex-col h-[80vh]">
-
+              <div className="mb-3 border rounded p-2 text-xs">
+  <div>Connected: {String(socket.connected)}</div>
+  <div>Messages: {messages.length}</div>
+  <div>Users: {users.length}</div>
+</div>
             <div className="flex-1 overflow-y-auto space-y-3 mb-4">
 
               {messages.length === 0 ? (
