@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { socket } from "../../lib/socket";
 
 type Message = {
+  id?: string;
   username: string;
   text: string;
   createdAt: string;
@@ -25,110 +26,138 @@ export default function ChatPage() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Socket connection
+  // ==========================
+  // SOCKET INIT
+  // ==========================
   useEffect(() => {
     console.log(
       "Socket URL:",
       process.env.NEXT_PUBLIC_SOCKET_URL
     );
 
-    socket.connect();
+    if (!socket.connected) {
+      socket.connect();
+    }
 
     socket.on("connect", () => {
       console.log("CONNECTED", socket.id);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("DISCONNECTED");
     });
 
     socket.on("connect_error", (err) => {
       console.error("CONNECT ERROR", err);
     });
 
-    // Receive old messages
-    socket.on("message-history", (history) => {
-  console.log("MESSAGE HISTORY", history);
-  setMessages(history);
-});
-
-    // Receive new messages
-    socket.on("new-message", (newMessage) => {
-  console.log(
-    "NEW MESSAGE RECEIVED",
-    JSON.stringify(newMessage)
-  );
-
-  setMessages((prev) => {
-    console.log(
-      "MESSAGES BEFORE:",
-      prev.length
-    );
-
-    const next = [...prev, newMessage];
-
-    console.log(
-      "MESSAGES AFTER:",
-      next.length
-    );
-console.log(
-  "RENDER",
-  messages.length,
-  messages
-);
-    return next;
-  });
-});
-
-    // Receive user list
-    socket.on("room-users", (roomUsers) => {
-      console.log("Users:", roomUsers);
-      setUsers(roomUsers);
+    socket.on("join-success", () => {
+      console.log("JOIN SUCCESS");
+      setJoined(true);
     });
 
-    socket.on("join-success", () => {
-  console.log("JOIN SUCCESS");
-  setJoined(true);
-});
+    socket.on("message-history", (history: Message[]) => {
+      console.log("MESSAGE HISTORY", history);
+
+      setMessages(
+        Array.isArray(history)
+          ? history
+          : []
+      );
+    });
+
+    socket.on("new-message", (newMessage: Message) => {
+      console.log(
+        "NEW MESSAGE RECEIVED",
+        newMessage
+      );
+
+      setMessages((prev) => {
+        const exists = prev.some(
+          (m) => m.id === newMessage.id
+        );
+
+        if (exists) {
+          return prev;
+        }
+
+        return [...prev, newMessage];
+      });
+    });
+
+    socket.on("room-users", (roomUsers: User[]) => {
+      console.log("ROOM USERS", roomUsers);
+
+      setUsers(
+        Array.isArray(roomUsers)
+          ? roomUsers
+          : []
+      );
+    });
 
     return () => {
       socket.off("connect");
+      socket.off("disconnect");
       socket.off("connect_error");
+      socket.off("join-success");
       socket.off("message-history");
       socket.off("new-message");
       socket.off("room-users");
-      socket.off("join-success");
     };
   }, []);
 
-  // Auto scroll
+  // ==========================
+  // AUTO SCROLL
+  // ==========================
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
       behavior: "smooth",
     });
   }, [messages]);
 
+  // ==========================
+  // JOIN ROOM
+  // ==========================
   function joinRoom() {
-  if (!username.trim() || !roomCode.trim()) {
-    alert("Please enter your name and room code.");
-    return;
+    if (!username.trim()) {
+      alert("Enter username");
+      return;
+    }
+
+    if (!roomCode.trim()) {
+      alert("Enter room code");
+      return;
+    }
+
+    console.log("JOINING ROOM");
+
+    socket.emit("join-room", {
+      username: username.trim(),
+      roomCode: roomCode
+        .trim()
+        .toUpperCase(),
+    });
   }
 
-  console.log("Joining room...");
-
-  socket.emit("join-room", {
-    username: username.trim(),
-    roomCode: roomCode.trim().toUpperCase(),
-  });
-}
-
+  // ==========================
+  // SEND MESSAGE
+  // ==========================
   function sendMessage() {
-    if (!message.trim()) return;
+    const text = message.trim();
+
+    if (!text) return;
 
     socket.emit(
       "send-message",
-      message.trim()
+      text
     );
 
     setMessage("");
   }
 
+  // ==========================
+  // LEAVE ROOM
+  // ==========================
   function leaveRoom() {
     socket.disconnect();
 
@@ -136,12 +165,20 @@ console.log(
     setMessages([]);
     setUsers([]);
     setMessage("");
+
+    setTimeout(() => {
+      socket.connect();
+    }, 500);
   }
 
+  // ==========================
+  // LOGIN PAGE
+  // ==========================
   if (!joined) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-md border rounded-lg p-6 shadow">
+
           <h1 className="text-3xl font-bold mb-6 text-center">
             Secret Chat
           </h1>
@@ -151,7 +188,9 @@ console.log(
             placeholder="Your name"
             value={username}
             onChange={(e) =>
-              setUsername(e.target.value)
+              setUsername(
+                e.target.value
+              )
             }
           />
 
@@ -172,17 +211,25 @@ console.log(
           >
             Join Room
           </button>
+
         </div>
       </div>
     );
   }
 
+  // ==========================
+  // CHAT PAGE
+  // ==========================
   return (
     <div className="min-h-screen p-4">
+
       <div className="max-w-5xl mx-auto">
+
         <div className="flex flex-col md:flex-row gap-4">
 
+          {/* SIDEBAR */}
           <div className="w-full md:w-64 border rounded-lg p-4">
+
             <h2 className="text-xl font-bold mb-2">
               Room: {roomCode}
             </h2>
@@ -209,47 +256,64 @@ console.log(
             >
               Leave Room
             </button>
+
           </div>
 
+          {/* CHAT */}
           <div className="flex-1 border rounded-lg p-4 flex flex-col h-[80vh]">
 
             <div className="flex-1 overflow-y-auto space-y-3 mb-4">
+
               {messages.length === 0 ? (
                 <p>No messages yet.</p>
               ) : (
                 messages.map((msg, index) => (
                   <div
-                    key={index}
+                    key={
+                      msg.id ??
+                      `${index}-${msg.createdAt}`
+                    }
                     className="border rounded p-3"
                   >
                     <div className="flex justify-between mb-1">
+
                       <strong>
                         {msg.username}
                       </strong>
 
-                      <span className="text-xs">
-  {String(msg.createdAt)}
-</span>
+                      <span className="text-xs text-gray-500">
+                        {new Date(
+                          msg.createdAt
+                        ).toLocaleTimeString()}
+                      </span>
+
                     </div>
 
                     <p>{msg.text}</p>
+
                   </div>
                 ))
               )}
 
               <div ref={messagesEndRef} />
+
             </div>
 
             <div className="flex gap-2">
+
               <input
                 className="flex-1 border rounded p-3"
                 value={message}
                 placeholder="Type a message..."
                 onChange={(e) =>
-                  setMessage(e.target.value)
+                  setMessage(
+                    e.target.value
+                  )
                 }
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") {
+                  if (
+                    e.key === "Enter"
+                  ) {
                     sendMessage();
                   }
                 }}
@@ -261,11 +325,15 @@ console.log(
               >
                 Send
               </button>
+
             </div>
 
           </div>
+
         </div>
+
       </div>
+
     </div>
   );
 }
