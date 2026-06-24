@@ -24,6 +24,29 @@ export default function ChatPage() {
   const [users, setUsers] = useState<User[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
+  useEffect(() => {
+  const saved = localStorage.getItem("chat_user");
+
+  if (!saved) return;
+
+  const data = JSON.parse(saved);
+
+  setUsername(data.username);
+  setRoomCode(data.roomCode);
+
+  const joinSavedRoom = () => {
+    socket.emit("join-room", {
+      username: data.username,
+      roomCode: data.roomCode,
+    });
+  };
+
+  if (socket.connected) {
+    joinSavedRoom();
+  } else {
+    socket.once("connect", joinSavedRoom);
+  }
+}, []);
   // ==========================
   // SOCKET INIT
   // ==========================
@@ -50,6 +73,14 @@ socket.on("connect_error", (err) => {
 });
 
     socket.on("join-success", () => {
+  localStorage.setItem(
+    "chat_user",
+    JSON.stringify({
+      username,
+      roomCode,
+    })
+  );
+
   setJoined(true);
 });
 socket.on("message-history", (history: Message[]) => {
@@ -157,6 +188,7 @@ socket.on("message-history", (history: Message[]) => {
   // LEAVE ROOM
   // ==========================
   function leaveRoom() {
+    localStorage.removeItem("chat_user");
     socket.disconnect();
 
     setJoined(false);
