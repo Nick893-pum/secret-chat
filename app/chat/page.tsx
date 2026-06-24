@@ -51,17 +51,28 @@ export default function ChatPage() {
     // Receive new messages
     socket.on("new-message", (newMessage) => {
   console.log(
-    "NEW MESSAGE EVENT",
+    "NEW MESSAGE RECEIVED",
     JSON.stringify(newMessage)
   );
 
   setMessages((prev) => {
     console.log(
-      "UPDATING MESSAGES",
+      "MESSAGES BEFORE:",
       prev.length
     );
 
-    return [...prev, newMessage];
+    const next = [...prev, newMessage];
+
+    console.log(
+      "MESSAGES AFTER:",
+      next.length
+    );
+console.log(
+  "RENDER",
+  messages.length,
+  messages
+);
+    return next;
   });
 });
 

@@ -77,9 +77,12 @@ socket.on("join-room", async ({ username, roomCode }) => {
     });
 
     socket.emit(
-      "message-history",
-      room?.messages || []
-    );
+  "message-history",
+  room?.messages.map((m) => ({
+    ...m,
+    createdAt: m.createdAt.toISOString(),
+  })) || []
+);
 
     io.to(roomCode).emit(
       "room-users",
