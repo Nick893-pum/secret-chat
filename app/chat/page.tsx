@@ -54,7 +54,7 @@ useEffect(() => {
     }
 
     socket.on("connect", () => {
-      console.log("CONNECTED", socket.id);
+      addLog("CONNECTED", socket.id);
     });
 
     socket.on("disconnect", () => {
@@ -66,7 +66,7 @@ useEffect(() => {
     });
 
     socket.on("join-success", () => {
-      console.log("JOIN SUCCESS");
+      addLog("JOIN SUCCESS");
       setJoined(true);
     });
 
@@ -81,7 +81,7 @@ useEffect(() => {
     });
 
     socket.on("new-message", (newMessage: Message) => {
-      console.log(
+      addLog(
         "NEW MESSAGE RECEIVED",
         newMessage
       );
@@ -278,86 +278,79 @@ useEffect(() => {
 
           </div>
 
-          {/* CHAT */}
-          <div className="flex-1 border rounded-lg p-4 flex flex-col h-[80vh]">
-              <div className="mb-3 border rounded p-2 text-xs">
-  <div>Connected: {String(socket.connected)}</div>
-  <div>Messages: {messages.length}</div>
-  <div>Users: {users.length}</div>
-</div>
-            <div className="flex-1 overflow-y-auto space-y-3 mb-4">
+          {/* CHAT PANEL */}
+<div className="flex-1 border rounded-lg p-4 flex flex-col h-[80vh]">
 
-              <>
-  <div
-    style={{
-      background: "yellow",
-      padding: 10,
-      marginBottom: 10,
-    }}
-  >
-    TOTAL MESSAGES: {messages.length}
+  <div className="text-xs text-red-500 mb-2">
+    Connected: {String(socket.connected)}
+    <br />
+    Messages: {messages.length}
+    <br />
+    Users: {users.length}
   </div>
 
-  {messages.map((msg, index) => (
-                  <div
-                    key={
-                      msg.id ??
-                      `${index}-${msg.createdAt}`
-                    }
-                    className="border rounded p-3"
-                  >
-                    <div className="flex justify-between mb-1">
+  {/* DEBUG LOGS */}
+  <div className="border rounded p-2 mb-3 h-32 overflow-y-auto bg-black text-green-400 text-[10px]">
+    {debugLogs.map((log, index) => (
+      <div key={index}>{log}</div>
+    ))}
+  </div>
 
-                      <strong>
-                        {msg.username}
-                      </strong>
+  {/* MESSAGE LIST */}
+  <div className="flex-1 overflow-y-auto space-y-3 mb-4">
 
-                      <span className="text-xs">
-  {msg.createdAt}
-</span>
+    {messages.length === 0 ? (
+      <p>No messages yet.</p>
+    ) : (
+      messages.map((msg, index) => (
+        <div
+          key={msg.id || msg.createdAt + index}
+          className="border rounded p-3"
+        >
+          <div className="flex justify-between mb-1">
+            <strong>{msg.username}</strong>
 
-                    </div>
-
-                    <p>{msg.text}</p>
-
-                  </div>
-                ))
-              )}
-
-              <div ref={messagesEndRef} />
-
-            </div>
-
-            <div className="flex gap-2">
-
-              <input
-                className="flex-1 border rounded p-3"
-                value={message}
-                placeholder="Type a message..."
-                onChange={(e) =>
-                  setMessage(
-                    e.target.value
-                  )
-                }
-                onKeyDown={(e) => {
-                  if (
-                    e.key === "Enter"
-                  ) {
-                    sendMessage();
-                  }
-                }}
-              />
-
-              <button
-                className="bg-green-600 text-white rounded px-6"
-                onClick={sendMessage}
-              >
-                Send
-              </button>
-
-            </div>
-
+            <span className="text-xs">
+              {String(msg.createdAt)}
+            </span>
           </div>
+
+          <p>{msg.text}</p>
+        </div>
+      ))
+    )}
+
+    <div ref={messagesEndRef} />
+
+  </div>
+
+  {/* INPUT */}
+  <div className="flex gap-2">
+
+    <input
+      className="flex-1 border rounded p-3"
+      value={message}
+      placeholder="Type a message..."
+      onChange={(e) =>
+        setMessage(e.target.value)
+      }
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          sendMessage();
+        }
+      }}
+    />
+
+    <button
+      className="bg-green-600 text-white rounded px-6"
+      onClick={sendMessage}
+    >
+      Send
+    </button>
+
+  </div>
+
+</div>
 
         </div>
 
