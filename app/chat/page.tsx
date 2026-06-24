@@ -297,7 +297,14 @@ socket.on("connect_error", (err) => {
   </div>
 
   {/* MESSAGE LIST */}
-  <div className="flex-1 overflow-y-auto space-y-3 mb-4">
+  <div
+  style={{
+    height: "500px",
+    overflow: "scroll",
+    border: "1px solid #ccc",
+    padding: "10px",
+  }}
+>
     <div className="bg-yellow-200 p-2">
   Total messages rendered: {messages.length}
 </div>
