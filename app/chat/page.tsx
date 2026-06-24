@@ -54,16 +54,16 @@ useEffect(() => {
     }
 
     socket.on("connect", () => {
-      addLog("CONNECTED", socket.id);
-    });
+  addLog(`CONNECTED ${socket.id}`);
+});
 
     socket.on("disconnect", () => {
-      console.log("DISCONNECTED");
-    });
+  addLog("DISCONNECTED");
+});
 
-    socket.on("connect_error", (err) => {
-      console.error("CONNECT ERROR", err);
-    });
+socket.on("connect_error", (err) => {
+  addLog(`CONNECT ERROR ${err.message}`);
+});
 
     socket.on("join-success", () => {
       addLog("JOIN SUCCESS");
@@ -71,33 +71,34 @@ useEffect(() => {
     });
 
     socket.on("message-history", (history: Message[]) => {
-      console.log("MESSAGE HISTORY", history);
+  addLog(
+    `MESSAGE HISTORY ${history?.length ?? 0}`
+  );
 
-      setMessages(
-        Array.isArray(history)
-          ? history
-          : []
-      );
-    });
+  setMessages(
+    Array.isArray(history)
+      ? history
+      : []
+  );
+});
 
     socket.on("new-message", (newMessage: Message) => {
-      addLog(
-        "NEW MESSAGE RECEIVED",
-        newMessage
-      );
+  addLog(
+    `NEW MESSAGE RECEIVED ${newMessage.username}: ${newMessage.text}`
+  );
 
-      setMessages((prev) => {
-        const exists = prev.some(
-          (m) => m.id === newMessage.id
-        );
+  setMessages((prev) => {
+    const exists = prev.some(
+      (m) => m.id === newMessage.id
+    );
 
-        if (exists) {
-          return prev;
-        }
+    if (exists) {
+      return prev;
+    }
 
-        return [...prev, newMessage];
-      });
-    });
+    return [...prev, newMessage];
+  });
+});
 
     socket.on("room-users", (roomUsers: User[]) => {
       console.log("ROOM USERS", roomUsers);
