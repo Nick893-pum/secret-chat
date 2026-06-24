@@ -267,6 +267,9 @@ socket.on("message-history", (history: Message[]) => {
       WebkitOverflowScrolling: "touch",
     }}
   >
+    <div className="text-red-500 text-sm mb-2">
+  Messages: {messages.length}
+</div>
     {messages.length === 0 ? (
       <p>No messages yet.</p>
     ) : (
