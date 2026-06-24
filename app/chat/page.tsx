@@ -220,7 +220,16 @@ socket.on("message-history", (history: Message[]) => {
   // ==========================
   return (
     <div className="min-h-screen p-4">
-
+<div
+  style={{
+    background: "red",
+    color: "white",
+    padding: 20,
+    fontSize: 24,
+  }}
+>
+  TEST BUILD 999
+</div>
       <div className="max-w-5xl mx-auto">
 
         <div className="flex flex-col md:flex-row gap-4">
