@@ -282,19 +282,19 @@ socket.on("connect_error", (err) => {
 >
   {/* MESSAGE LIST */}
   <div
-    className="flex-1 space-y-3 mb-4"
-    style={{
-      minHeight: 0,
-      overflowY: "auto",
-      WebkitOverflowScrolling: "touch",
-    }}
-  >
+  className="flex-1 overflow-y-auto mb-4"
+  style={{
+    minHeight: 0,
+    WebkitOverflowScrolling: "touch",
+  }}
+>
     {messages.length === 0 ? (
       <p>No messages yet.</p>
     ) : (
-      messages.map((msg, index) => (
+      <div className="space-y-3">
+      {messages.map((msg, index) => (
         <div
-          key={msg.id || index}
+          key={msg.id ?? `${msg.createdAt}-${index}`}
           className="border rounded p-3"
         >
           <div className="flex justify-between mb-1">
@@ -309,8 +309,9 @@ socket.on("connect_error", (err) => {
 
           <p>{msg.text}</p>
         </div>
-      ))
-    )}
+      ))}
+    </div>
+  )}
 
     <div ref={messagesEndRef} />
   </div>
