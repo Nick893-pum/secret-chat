@@ -33,6 +33,7 @@ export default function ChatPage() {
 
   setUsername(data.username);
   setRoomCode(data.roomCode);
+  setJoined(true);
 
   const joinSavedRoom = () => {
     socket.emit("join-room", {
@@ -73,15 +74,7 @@ socket.on("connect_error", (err) => {
 });
 
     socket.on("join-success", () => {
-  localStorage.setItem(
-    "chat_user",
-    JSON.stringify({
-      username,
-      roomCode,
-    })
-  );
-
-  setJoined(true);
+    setJoined(true);
 });
 socket.on("message-history", (history: Message[]) => {
   console.log(
@@ -157,7 +150,13 @@ socket.on("message-history", (history: Message[]) => {
       alert("Enter room code");
       return;
     }
-
+localStorage.setItem(
+    "chat_user",
+    JSON.stringify({
+      username: username.trim(),
+      roomCode: roomCode.trim().toUpperCase(),
+    })
+  );
     console.log("JOINING ROOM");
 
     socket.emit("join-room", {
