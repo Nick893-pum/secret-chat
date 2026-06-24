@@ -74,10 +74,6 @@ socket.on("connect_error", (err) => {
     });
 
     socket.on("message-history", (history: Message[]) => {
-  addLog(
-    `MESSAGE HISTORY ${history?.length ?? 0}`
-  );
-
   setMessages(
     Array.isArray(history)
       ? history
@@ -86,16 +82,14 @@ socket.on("connect_error", (err) => {
 });
 
     socket.on("new-message", (newMessage: Message) => {
-  addLog(
-    `NEW MESSAGE RECEIVED ${newMessage.username}: ${newMessage.text}`
-  );
-
   setMessages((prev) => {
-    const next = [...prev, newMessage];
+    const exists = prev.some(
+      (m) => m.id === newMessage.id
+    );
 
-    addLog(`STATE AFTER ${next.length}`);
+    if (exists) return prev;
 
-    return next;
+    return [...prev, newMessage];
   });
 });
 
@@ -279,53 +273,50 @@ socket.on("connect_error", (err) => {
           </div>
 
           {/* CHAT PANEL */}
-<div className="flex-1 border rounded-lg p-4 flex flex-col h-[80vh]">
-
-  <div className="text-xs text-red-500 mb-2">
-    Connected: {String(socket.connected)}
-    <br />
-    Messages: {messages.length}
-    <br />
-    Users: {users.length}
-  </div>
-
-  {/* DEBUG LOGS */}
-  <div className="border rounded p-2 mb-3 h-32 overflow-y-auto bg-black text-green-400 text-[10px]">
-    {debugLogs.map((log, index) => (
-      <div key={index}>{log}</div>
-    ))}
-  </div>
-
+<div
+  className="flex-1 border rounded-lg p-4 flex flex-col"
+  style={{
+    height: "80vh",
+    minHeight: 0,
+  }}
+>
   {/* MESSAGE LIST */}
   <div
-  style={{
-    height: "500px",
-    overflow: "scroll",
-    border: "1px solid #ccc",
-    padding: "10px",
-  }}
->
-    <div className="bg-yellow-200 p-2">
-  Total messages rendered: {messages.length}
-</div>
-    <pre
-  style={{
-    whiteSpace: "pre-wrap",
-    fontSize: "12px",
-    maxHeight: "500px",
-    overflow: "auto",
-  }}
->
-  {JSON.stringify(messages, null, 2)}
-</pre>
+    className="flex-1 space-y-3 mb-4"
+    style={{
+      minHeight: 0,
+      overflowY: "auto",
+      WebkitOverflowScrolling: "touch",
+    }}
+  >
+    {messages.length === 0 ? (
+      <p>No messages yet.</p>
+    ) : (
+      messages.map((msg, index) => (
+        <div
+          key={msg.id || index}
+          className="border rounded p-3"
+        >
+          <div className="flex justify-between mb-1">
+            <strong>{msg.username}</strong>
+
+            <span className="text-xs text-gray-500">
+              {new Date(
+                msg.createdAt
+              ).toLocaleTimeString()}
+            </span>
+          </div>
+
+          <p>{msg.text}</p>
+        </div>
+      ))
+    )}
 
     <div ref={messagesEndRef} />
-
   </div>
 
   {/* INPUT */}
   <div className="flex gap-2">
-
     <input
       className="flex-1 border rounded p-3"
       value={message}
@@ -346,10 +337,10 @@ socket.on("connect_error", (err) => {
     >
       Send
     </button>
-
   </div>
-
 </div>
+
+  
 
         </div>
 
