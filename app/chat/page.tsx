@@ -304,7 +304,7 @@ socket.on("connect_error", (err) => {
     ) : (
       messages.map((msg, index) => (
         <div
-          key={msg.id || msg.createdAt + index}
+          key={index}
           className="border rounded p-3"
         >
           <div className="flex justify-between mb-1">
