@@ -23,6 +23,9 @@ export default function ChatPage() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
 useEffect(() => {
+  addLog(`RENDER ${messages.length}`);
+}, [messages]);
+  useEffect(() => {
   console.log(
     "MESSAGES STATE CHANGED:",
     messages.length,
@@ -88,15 +91,11 @@ socket.on("connect_error", (err) => {
   );
 
   setMessages((prev) => {
-    const exists = prev.some(
-      (m) => m.id === newMessage.id
-    );
+    const next = [...prev, newMessage];
 
-    if (exists) {
-      return prev;
-    }
+    addLog(`STATE AFTER ${next.length}`);
 
-    return [...prev, newMessage];
+    return next;
   });
 });
 
