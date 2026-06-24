@@ -52,7 +52,17 @@ socket.on("connect_error", (err) => {
     socket.on("join-success", () => {
   setJoined(true);
 });
+socket.on("message-history", (history: Message[]) => {
+  console.log(
+    "MESSAGE HISTORY",
+    history.length
+  );
 
+  setMessages(history);
+});
+<div>
+  Messages: {messages.length}
+</div>
     socket.on("message-history", (history: Message[]) => {
   setMessages(
     Array.isArray(history)
