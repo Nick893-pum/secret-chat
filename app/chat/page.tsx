@@ -19,30 +19,11 @@ export default function ChatPage() {
   const [username, setUsername] = useState("");
   const [roomCode, setRoomCode] = useState("");
   const [joined, setJoined] = useState(false);
-
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
-useEffect(() => {
-  addLog(`RENDER ${messages.length}`);
-}, [messages]);
-  useEffect(() => {
-  console.log(
-    "MESSAGES STATE CHANGED:",
-    messages.length,
-    messages
-  );
-}, [messages]);
   const [users, setUsers] = useState<User[]>([]);
-  const [debugLogs, setDebugLogs] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  function addLog(msg: string) {
-  console.log(msg);
-
-  setDebugLogs((prev) => [
-    ...prev.slice(-30),
-    `${new Date().toLocaleTimeString()} | ${msg}`,
-  ]);
-}
+  
   // ==========================
   // SOCKET INIT
   // ==========================
@@ -57,21 +38,20 @@ useEffect(() => {
     }
 
     socket.on("connect", () => {
-  addLog(`CONNECTED ${socket.id}`);
+  console.log("CONNECTED", socket.id);
 });
 
     socket.on("disconnect", () => {
-  addLog("DISCONNECTED");
+  console.log("DISCONNECTED");
 });
 
 socket.on("connect_error", (err) => {
-  addLog(`CONNECT ERROR ${err.message}`);
+  console.error("CONNECT ERROR", err);
 });
 
     socket.on("join-success", () => {
-      addLog("JOIN SUCCESS");
-      setJoined(true);
-    });
+  setJoined(true);
+});
 
     socket.on("message-history", (history: Message[]) => {
   setMessages(
@@ -183,12 +163,7 @@ socket.on("connect_error", (err) => {
   // LOGIN PAGE
   // ==========================
   if (!joined) {
-    console.log(
-  "RENDER CHAT",
-  messages.length,
-  users.length
-);
-    return (
+        return (
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-md border rounded-lg p-6 shadow">
 
