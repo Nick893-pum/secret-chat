@@ -287,10 +287,18 @@ useEffect(() => {
 </div>
             <div className="flex-1 overflow-y-auto space-y-3 mb-4">
 
-              {messages.length === 0 ? (
-                <p>No messages yet.</p>
-              ) : (
-                messages.map((msg, index) => (
+              <>
+  <div
+    style={{
+      background: "yellow",
+      padding: 10,
+      marginBottom: 10,
+    }}
+  >
+    TOTAL MESSAGES: {messages.length}
+  </div>
+
+  {messages.map((msg, index) => (
                   <div
                     key={
                       msg.id ??
