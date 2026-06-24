@@ -298,27 +298,19 @@ socket.on("connect_error", (err) => {
 
   {/* MESSAGE LIST */}
   <div className="flex-1 overflow-y-auto space-y-3 mb-4">
-
-    {messages.length === 0 ? (
-      <p>No messages yet.</p>
-    ) : (
-      messages.map((msg, index) => (
-        <div
-          key={index}
-          className="border rounded p-3"
-        >
-          <div className="flex justify-between mb-1">
-            <strong>{msg.username}</strong>
-
-            <span className="text-xs">
-              {String(msg.createdAt)}
-            </span>
-          </div>
-
-          <p>{msg.text}</p>
-        </div>
-      ))
-    )}
+    <div className="bg-yellow-200 p-2">
+  Total messages rendered: {messages.length}
+</div>
+    <pre
+  style={{
+    whiteSpace: "pre-wrap",
+    fontSize: "12px",
+    maxHeight: "500px",
+    overflow: "auto",
+  }}
+>
+  {JSON.stringify(messages, null, 2)}
+</pre>
 
     <div ref={messagesEndRef} />
 
