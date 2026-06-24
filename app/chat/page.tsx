@@ -275,21 +275,17 @@ socket.on("message-history", (history: Message[]) => {
 
           </div>
 
-          {/* CHAT PANEL */}
-<div className="flex-1 border rounded-lg p-4 flex flex-col h-[80vh] min-h-0">
-
-  {/* MESSAGE LIST */}
+         {/* CHAT PANEL */}
 <div
   style={{
-    flex: 1,
-    overflow: "auto",
     border: "3px solid red",
+    padding: "20px",
     background: "white",
     color: "black",
-    padding: 10,
+    flex: 1,
   }}
 >
-  <div>COUNT: {messages.length}</div>
+  <h1>MESSAGE COUNT: {messages.length}</h1>
 
   <div>
     TYPE:
@@ -312,9 +308,28 @@ socket.on("message-history", (history: Message[]) => {
     FIRST STRING:
     {String(messages[0])}
   </div>
-</div>
 
-  {/* INPUT */}
+  <hr />
+
+  {messages.map((msg, index) => (
+    <div
+      key={index}
+      style={{
+        marginBottom: "20px",
+        border: "1px solid #ccc",
+        padding: "10px",
+      }}
+    >
+      <div>
+        USER: {msg.username}
+      </div>
+
+      <div>
+        TEXT: {msg.text}
+      </div>
+    </div>
+  ))}
+
   <div className="flex gap-2 mt-4">
     <input
       className="flex-1 border rounded p-3"
@@ -337,7 +352,6 @@ socket.on("message-history", (history: Message[]) => {
       Send
     </button>
   </div>
-
 </div>
 
   
