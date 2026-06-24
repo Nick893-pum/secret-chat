@@ -281,11 +281,9 @@ export default function ChatPage() {
                         {msg.username}
                       </strong>
 
-                      <span className="text-xs text-gray-500">
-                        {new Date(
-                          msg.createdAt
-                        ).toLocaleTimeString()}
-                      </span>
+                      <span className="text-xs">
+  {msg.createdAt}
+</span>
 
                     </div>
 
