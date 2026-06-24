@@ -282,38 +282,36 @@ socket.on("message-history", (history: Message[]) => {
 <div
   style={{
     flex: 1,
-    overflowY: "auto",
+    overflow: "auto",
     border: "3px solid red",
     background: "white",
     color: "black",
+    padding: 10,
   }}
 >
+  <div>COUNT: {messages.length}</div>
+
   <div>
-    MESSAGE COUNT: {messages.length}
+    TYPE:
+    {Array.isArray(messages)
+      ? "ARRAY"
+      : typeof messages}
   </div>
 
-  <pre
-  style={{
-    fontSize: "10px",
-    whiteSpace: "pre-wrap",
-  }}
->
-  {JSON.stringify(messages.slice(0, 3), null, 2)}
-</pre>
+  <div>
+    FIRST EXISTS:
+    {String(messages[0] !== undefined)}
+  </div>
 
-  {messages.map((msg, index) => (
-    <div
-      key={index}
-      style={{
-        borderBottom: "1px solid #ddd",
-        padding: "8px",
-      }}
-    >
-      {msg.username}: {msg.text}
-    </div>
-  ))}
+  <div>
+    FIRST TYPE:
+    {typeof messages[0]}
+  </div>
 
-  <div ref={messagesEndRef} />
+  <div>
+    FIRST STRING:
+    {String(messages[0])}
+  </div>
 </div>
 
   {/* INPUT */}
