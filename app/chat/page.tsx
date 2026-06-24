@@ -275,61 +275,42 @@ socket.on("message-history", (history: Message[]) => {
 
           </div>
 
-         {/* CHAT PANEL */}
-<div
-  style={{
-    border: "3px solid red",
-    padding: "20px",
-    background: "white",
-    color: "black",
-    flex: 1,
-  }}
->
-  <h1>MESSAGE COUNT: {messages.length}</h1>
+        {/* CHAT PANEL */}
+<div className="flex-1 border rounded-lg p-4">
 
-  <div>
-    TYPE:
-    {Array.isArray(messages)
-      ? "ARRAY"
-      : typeof messages}
-  </div>
+  {/* MESSAGE LIST */}
+  <div
+    style={{
+      height: "60vh",
+      overflowY: "auto",
+      WebkitOverflowScrolling: "touch",
+    }}
+  >
+    <div className="space-y-3">
+      {messages.map((msg, index) => (
+        <div
+          key={msg.id || index}
+          className="border rounded p-3"
+        >
+          <div className="flex justify-between mb-1">
+            <strong>{msg.username}</strong>
 
-  <div>
-    FIRST EXISTS:
-    {String(messages[0] !== undefined)}
-  </div>
+            <span className="text-xs text-gray-500">
+              {new Date(
+                msg.createdAt
+              ).toLocaleTimeString()}
+            </span>
+          </div>
 
-  <div>
-    FIRST TYPE:
-    {typeof messages[0]}
-  </div>
-
-  <div>
-    FIRST STRING:
-    {String(messages[0])}
-  </div>
-
-  <hr />
-
-  {messages.map((msg, index) => (
-    <div
-      key={index}
-      style={{
-        marginBottom: "20px",
-        border: "1px solid #ccc",
-        padding: "10px",
-      }}
-    >
-      <div>
-        USER: {msg.username}
-      </div>
-
-      <div>
-        TEXT: {msg.text}
-      </div>
+          <p>{msg.text}</p>
+        </div>
+      ))}
     </div>
-  ))}
 
+    <div ref={messagesEndRef} />
+  </div>
+
+  {/* INPUT */}
   <div className="flex gap-2 mt-4">
     <input
       className="flex-1 border rounded p-3"
@@ -352,6 +333,7 @@ socket.on("message-history", (history: Message[]) => {
       Send
     </button>
   </div>
+
 </div>
 
   
