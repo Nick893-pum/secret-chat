@@ -292,10 +292,14 @@ socket.on("message-history", (history: Message[]) => {
     MESSAGE COUNT: {messages.length}
   </div>
 
-  <div>
-    FIRST MESSAGE:
-    {messages[0]?.text}
-  </div>
+  <pre
+  style={{
+    fontSize: "10px",
+    whiteSpace: "pre-wrap",
+  }}
+>
+  {JSON.stringify(messages[0], null, 2)}
+</pre>
 
   {messages.map((msg, index) => (
     <div
