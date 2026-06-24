@@ -273,51 +273,48 @@ socket.on("connect_error", (err) => {
           </div>
 
           {/* CHAT PANEL */}
-<div
-  className="flex-1 border rounded-lg p-4 flex flex-col"
-  style={{
-    height: "80vh",
-    minHeight: 0,
-  }}
->
+<div className="flex-1 border rounded-lg p-4 flex flex-col h-[80vh] min-h-0">
+
   {/* MESSAGE LIST */}
   <div
-  className="flex-1 overflow-y-auto mb-4"
-  style={{
-    minHeight: 0,
-    WebkitOverflowScrolling: "touch",
-  }}
->
+    className="flex-1 overflow-y-auto min-h-0"
+    style={{
+      WebkitOverflowScrolling: "touch",
+    }}
+  >
     {messages.length === 0 ? (
       <p>No messages yet.</p>
     ) : (
       <div className="space-y-3">
-      {messages.map((msg, index) => (
-        <div
-          key={msg.id ?? `${msg.createdAt}-${index}`}
-          className="border rounded p-3"
-        >
-          <div className="flex justify-between mb-1">
-            <strong>{msg.username}</strong>
+        {messages.map((msg, index) => (
+          <div
+            key={
+              msg.id ??
+              `${msg.createdAt}-${index}`
+            }
+            className="border rounded p-3"
+          >
+            <div className="flex justify-between mb-1">
+              <strong>{msg.username}</strong>
 
-            <span className="text-xs text-gray-500">
-              {new Date(
-                msg.createdAt
-              ).toLocaleTimeString()}
-            </span>
+              <span className="text-xs text-gray-500">
+                {new Date(
+                  msg.createdAt
+                ).toLocaleTimeString()}
+              </span>
+            </div>
+
+            <p>{msg.text}</p>
           </div>
-
-          <p>{msg.text}</p>
-        </div>
-      ))}
-    </div>
-  )}
+        ))}
+      </div>
+    )}
 
     <div ref={messagesEndRef} />
   </div>
 
   {/* INPUT */}
-  <div className="flex gap-2">
+  <div className="flex gap-2 mt-4">
     <input
       className="flex-1 border rounded p-3"
       value={message}
@@ -339,6 +336,7 @@ socket.on("connect_error", (err) => {
       Send
     </button>
   </div>
+
 </div>
 
   
