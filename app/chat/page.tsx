@@ -298,7 +298,7 @@ socket.on("message-history", (history: Message[]) => {
     whiteSpace: "pre-wrap",
   }}
 >
-  {JSON.stringify(messages[0], null, 2)}
+  {JSON.stringify(messages.slice(0, 3), null, 2)}
 </pre>
 
   {messages.map((msg, index) => (
