@@ -19,6 +19,9 @@ model Message {
   id         String   @id @default(cuid())
   username   String
   text       String
+
+  stickerUrl String?
+  
   createdAt  DateTime @default(now())
 
   roomId     String

@@ -8,6 +8,7 @@ type Message = {
   username: string;
   text: string;
   createdAt: string;
+  stickerUrl?: string;
 };
 
 type User = {
@@ -24,6 +25,12 @@ export default function ChatPage() {
   const [users, setUsers] = useState<User[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [typingUser, setTypingUser] = useState("");
+  const stickers = [
+  "/stickers/happy.webp",
+  "/stickers/love.webp",
+  "/stickers/laugh.webp",
+  "/stickers/thumbup.webp",
+];
   useEffect(() => {
   const saved = localStorage.getItem("chat_user");
 
@@ -353,7 +360,15 @@ localStorage.setItem(
             </span>
           </div>
 
-          <p>{msg.text}</p>
+          {msg.stickerUrl ? (
+  <img
+    src={msg.stickerUrl}
+    alt="sticker"
+    className="w-28"
+  />
+) : (
+  <p>{msg.text}</p>
+)}
         </div>
       </div>
     );
@@ -367,7 +382,32 @@ localStorage.setItem(
     {typingUser} is typing...
   </div>
 )}
+<button
+  onClick={() =>
+    socket.emit(
+      "send-sticker",
+      "/stickers/happy.webp"
+    )
+  }
+>
+  😀
+</button>
   {/* INPUT */}
+  <div className="flex gap-2">
+  {stickers.map((s) => (
+    <img
+      key={s}
+      src={s}
+      className="w-16 cursor-pointer"
+      onClick={() =>
+        socket.emit(
+          "send-sticker",
+          s
+        )
+      }
+    />
+  ))}
+</div>
   <div className="flex gap-2 mt-4">
     <input
       className="flex-1 border rounded p-3"
