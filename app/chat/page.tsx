@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import EmojiPicker from "emoji-picker-react";
 import { socket } from "../../lib/socket";
 
 type Message = {
@@ -20,6 +21,7 @@ export default function ChatPage() {
   const [roomCode, setRoomCode] = useState("");
   const [joined, setJoined] = useState(false);
   const [message, setMessage] = useState("");
+  const [showEmoji, setShowEmoji] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -70,6 +72,14 @@ export default function ChatPage() {
   console.log("DISCONNECTED");
 });
 
+socket.on("typing", (username) => {
+  setTypingUser(username);
+
+  setTimeout(() => {
+    setTypingUser("");
+  }, 1500);
+});
+
 socket.on("connect_error", (err) => {
   console.error("CONNECT ERROR", err);
 });
@@ -77,17 +87,7 @@ socket.on("connect_error", (err) => {
     socket.on("join-success", () => {
     setJoined(true);
 });
-socket.on("message-history", (history: Message[]) => {
-  console.log(
-    "MESSAGE HISTORY",
-    history.length
-  );
 
-  setMessages(history);
-});
-<div>
-  Messages: {messages.length}
-</div>
     socket.on("message-history", (history: Message[]) => {
   setMessages(
     Array.isArray(history)
@@ -129,13 +129,7 @@ socket.on("message-history", (history: Message[]) => {
       socket.off("typing");
     };
   }, []);
-socket.on("typing", (username) => {
-  setTypingUser(username);
 
-  setTimeout(() => {
-    setTypingUser("");
-  }, 1500);
-});
   // ==========================
   // AUTO SCROLL
   // ==========================
@@ -368,8 +362,32 @@ localStorage.setItem(
     {typingUser} is typing...
   </div>
 )}
+
+{/* EMOJI PICKER */}
+{showEmoji && (
+  <div className="mb-2">
+    <EmojiPicker
+      onEmojiClick={(emojiData) => {
+        setMessage(
+          (prev) => prev + emojiData.emoji
+        );
+      }}
+    />
+  </div>
+)}
+
   {/* INPUT */}
+  
   <div className="flex gap-2 mt-4">
+
+    <button
+  onClick={() =>
+    setShowEmoji(!showEmoji)
+  }
+>
+  😀
+</button>
+
     <input
       className="flex-1 border rounded p-3"
       value={message}
