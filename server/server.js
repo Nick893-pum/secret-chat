@@ -63,18 +63,26 @@ socket.on("join-room", async ({ username, roomCode }) => {
     }
 
     const room = await prisma.room.findUnique({
-      where: {
-        code: roomCode,
+  where: {
+    code: roomCode,
+  },
+  include: {
+    messages: {
+      orderBy: {
+        createdAt: "desc",
       },
-      include: {
-        messages: {
-          orderBy: {
-            createdAt: "asc",
-          },
-          take: 100000,
-        },
-      },
-    });
+      take: 200,
+    },
+  },
+});
+
+const history =
+  room?.messages
+    .reverse()
+    .map((m) => ({
+      ...m,
+      createdAt: m.createdAt.toISOString(),
+    })) || [];
 
     socket.emit(
   "message-history",
