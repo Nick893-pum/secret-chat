@@ -71,7 +71,7 @@ socket.on("join-room", async ({ username, roomCode }) => {
           orderBy: {
             createdAt: "asc",
           },
-          take: 100,
+          take: 100000,
         },
       },
     });
