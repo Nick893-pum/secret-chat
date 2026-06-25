@@ -371,6 +371,7 @@ localStorage.setItem(
         setMessage(
           (prev) => prev + emojiData.emoji
         );
+       setShowEmoji(false);
       }}
     />
   </div>
@@ -381,11 +382,12 @@ localStorage.setItem(
   <div className="flex gap-2 mt-4">
 
     <button
+  className="text-2xl px-2"
   onClick={() =>
     setShowEmoji(!showEmoji)
   }
 >
-  😀
+  😊
 </button>
 
     <input
