@@ -23,7 +23,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+  const [typingUser, setTypingUser] = useState("");
   useEffect(() => {
   const saved = localStorage.getItem("chat_user");
 
@@ -125,9 +125,16 @@ socket.on("message-history", (history: Message[]) => {
       socket.off("message-history");
       socket.off("new-message");
       socket.off("room-users");
+      socket.off("typing");
     };
   }, []);
+socket.on("typing", (username) => {
+  setTypingUser(username);
 
+  setTimeout(() => {
+    setTypingUser("");
+  }, 1500);
+});
   // ==========================
   // AUTO SCROLL
   // ==========================
@@ -291,6 +298,7 @@ localStorage.setItem(
 <div className="flex-1 border rounded-lg p-4">
 
   {/* MESSAGE LIST */}
+  
   <div
     style={{
       height: "60vh",
@@ -354,16 +362,22 @@ localStorage.setItem(
 
     <div ref={messagesEndRef} />
   </div>
-
+{typingUser && (
+  <div className="text-sm text-gray-500 italic mb-2">
+    {typingUser} is typing...
+  </div>
+)}
   {/* INPUT */}
   <div className="flex gap-2 mt-4">
     <input
       className="flex-1 border rounded p-3"
       value={message}
       placeholder="Type a message..."
-      onChange={(e) =>
-        setMessage(e.target.value)
-      }
+      onChange={(e) => {
+  setMessage(e.target.value);
+
+  socket.emit("typing");
+}}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
           sendMessage();

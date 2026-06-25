@@ -107,6 +107,17 @@ const history =
   }
 });
 
+socket.on("typing", () => {
+  const roomCode = socket.data.roomCode;
+  const username = socket.data.username;
+
+  if (!roomCode || !username) return;
+
+  socket
+    .to(roomCode)
+    .emit("typing", username);
+});
+
   socket.on("send-message", async (text) => {
   try {
     const roomCode = socket.data.roomCode;
