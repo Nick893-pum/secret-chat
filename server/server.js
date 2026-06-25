@@ -118,44 +118,6 @@ socket.on("typing", () => {
     .emit("typing", username);
 });
 
-socket.on(
-  "send-sticker",
-  async (stickerUrl) => {
-    const roomCode = socket.data.roomCode;
-    const username = socket.data.username;
-
-    if (!roomCode || !username) return;
-
-    const room = await prisma.room.upsert({
-      where: { code: roomCode },
-      update: {},
-      create: { code: roomCode },
-    });
-
-    const message =
-      await prisma.message.create({
-        data: {
-          username,
-          stickerUrl,
-          roomId: room.id,
-        },
-      });
-
-    io.to(roomCode).emit(
-      "new-message",
-      {
-        id: message.id,
-        username: message.username,
-        stickerUrl:
-          message.stickerUrl,
-        text: null,
-        createdAt:
-          message.createdAt.toISOString(),
-      }
-    );
-  }
-);
-
   socket.on("send-message", async (text) => {
   try {
     const roomCode = socket.data.roomCode;
