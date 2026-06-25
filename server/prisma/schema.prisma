@@ -19,8 +19,6 @@ model Message {
   id         String   @id @default(cuid())
   username   String
   text       String
-  imageUrl   String?
-  seen       Boolean @default(false)
   createdAt  DateTime @default(now())
 
   roomId     String
