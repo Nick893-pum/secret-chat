@@ -299,25 +299,58 @@ localStorage.setItem(
     }}
   >
     <div className="space-y-3">
-      {messages.map((msg, index) => (
-        <div
-          key={msg.id || index}
-          className="border rounded p-3"
-        >
-          <div className="flex justify-between mb-1">
-            <strong>{msg.username}</strong>
+  {messages.map((msg, index) => {
+    const isMe =
+      msg.username === username;
 
-            <span className="text-xs text-gray-500">
+    return (
+      <div
+        key={msg.id || index}
+        className={`flex ${
+          isMe
+            ? "justify-end"
+            : "justify-start"
+        }`}
+      >
+        <div
+          className={`max-w-[80%] rounded-xl p-3 shadow-sm ${
+            isMe
+              ? "bg-blue-500 text-white"
+              : "bg-gray-100 text-black"
+          }`}
+        >
+          <div className="flex justify-between gap-4 mb-1">
+            <strong>
+              {msg.username}
+            </strong>
+
+            <span
+              className={`text-xs ${
+                isMe
+                  ? "text-blue-100"
+                  : "text-gray-500"
+              }`}
+            >
               {new Date(
                 msg.createdAt
-              ).toLocaleTimeString()}
+              ).toLocaleString(
+                "vi-VN",
+                {
+                  day: "2-digit",
+                  month: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }
+              )}
             </span>
           </div>
 
           <p>{msg.text}</p>
         </div>
-      ))}
-    </div>
+      </div>
+    );
+  })}
+</div>
 
     <div ref={messagesEndRef} />
   </div>
