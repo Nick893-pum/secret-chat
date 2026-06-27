@@ -24,19 +24,5 @@ model Message {
   roomId     String
   room       Room     @relation(fields: [roomId], references: [id])
 
-reactions Reaction[]
-
   @@index([roomId, createdAt])
-}
-
-model Reaction {
-  id        String   @id @default(cuid())
-
-  emoji     String
-  username  String
-
-  messageId String
-  message   Message @relation(fields: [messageId], references: [id])
-
-  createdAt DateTime @default(now())
 }
