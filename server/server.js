@@ -62,6 +62,17 @@ socket.on("join-room", async ({ username, roomCode }) => {
       });
     }
 
+await prisma.message.deleteMany({
+  where: {
+    createdAt: {
+      lt: new Date(
+        Date.now() -
+          24 * 60 * 60 * 1000
+      ),
+    },
+  },
+});
+
     const room = await prisma.room.findUnique({
   where: {
     code: roomCode,
