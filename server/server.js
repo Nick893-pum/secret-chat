@@ -216,6 +216,10 @@ io.to(roomCode).emit("new-message", {
   });
 });
 
+socket.on("add-reaction", async (data) => {
+
+});
+
 const PORT = process.env.PORT || 4000;
 
 server.listen(PORT, () => {

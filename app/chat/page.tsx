@@ -4,17 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import EmojiPicker from "emoji-picker-react";
 import { socket } from "../../lib/socket";
 
+
 type Message = {
   id?: string;
   username: string;
   text: string;
   createdAt: string;
-
-  replyTo?: {
-    username: string;
-    text: string;
-  };
-};
+}
 
 type User = {
   id: string;
@@ -26,8 +22,6 @@ export default function ChatPage() {
   const [roomCode, setRoomCode] = useState("");
   const [joined, setJoined] = useState(false);
   const [message, setMessage] = useState("");
-  const [replyTo, setReplyTo] =
-  useState<Message | null>(null);
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
   const [showEmoji, setShowEmoji] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -188,7 +182,6 @@ localStorage.setItem(
   socket.emit("send-message", text);
 
   setMessage("");
-  setReplyTo(null);
 }
 
   // ==========================
@@ -318,14 +311,7 @@ localStorage.setItem(
   className={`flex cursor-pointer ${
     isMe ? "justify-end" : "justify-start"
   }`}
-  onTouchStart={() => {
-    pressTimer.current = setTimeout(() => {
-      if ("vibrate" in navigator) {
-  navigator.vibrate(30);
-}
-      setReplyTo(msg);
-    }, 500);
-  }}
+  
   onTouchEnd={() => {
     if (pressTimer.current) {
       clearTimeout(pressTimer.current);
@@ -336,14 +322,6 @@ localStorage.setItem(
       clearTimeout(pressTimer.current);
     }
   }}
-  onMouseDown={() => {
-  pressTimer.current = setTimeout(() => {
-    if ("vibrate" in navigator) {
-  navigator.vibrate(30);
-}
-    setReplyTo(msg);
-  }, 500);
-}}
 
 onMouseUp={() => {
   if (pressTimer.current) {
@@ -390,18 +368,6 @@ onMouseLeave={() => {
             </span>
           </div>
 
-{msg.replyTo && (
-  <div className="border-l-2 border-gray-400 pl-2 mb-2 text-sm opacity-80">
-    <div>
-      {msg.replyTo.username}
-    </div>
-
-    <div>
-      {msg.replyTo.text}
-    </div>
-  </div>
-)}
-
   <p>{msg.text}</p>
         </div>
       </div>
@@ -428,28 +394,6 @@ onMouseLeave={() => {
        setShowEmoji(false);
       }}
     />
-  </div>
-)}
-
-{/* REPLY TO */}
-{replyTo && (
-  <div className="border-l-4 border-blue-500 bg-gray-100 p-2 mb-2 rounded">
-    <div className="font-semibold text-sm">
-      Replying to {replyTo.username}
-    </div>
-
-    <div className="text-sm text-gray-600 truncate">
-      {replyTo.text}
-    </div>
-
-    <button
-      onClick={() =>
-        setReplyTo(null)
-      }
-      className="text-red-500 text-xs"
-    >
-      Cancel
-    </button>
   </div>
 )}
 
