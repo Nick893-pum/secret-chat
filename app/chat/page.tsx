@@ -21,6 +21,9 @@ export default function ChatPage() {
   const [roomCode, setRoomCode] = useState("");
   const [joined, setJoined] = useState(false);
   const [message, setMessage] = useState("");
+  const [replyTo, setReplyTo] =
+  useState<Message | null>(null);
+  const pressTimer = useRef<NodeJS.Timeout | null>(null);
   const [showEmoji, setShowEmoji] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -308,13 +311,49 @@ localStorage.setItem(
 
     return (
       <div
-        key={msg.id || index}
-        className={`flex ${
-          isMe
-            ? "justify-end"
-            : "justify-start"
-        }`}
-      >
+  key={msg.id || index}
+  className={`flex cursor-pointer ${
+    isMe ? "justify-end" : "justify-start"
+  }`}
+  onTouchStart={() => {
+    pressTimer.current = setTimeout(() => {
+      if ("vibrate" in navigator) {
+  navigator.vibrate(30);
+}
+      setReplyTo(msg);
+    }, 500);
+  }}
+  onTouchEnd={() => {
+    if (pressTimer.current) {
+      clearTimeout(pressTimer.current);
+    }
+  }}
+  onTouchMove={() => {
+    if (pressTimer.current) {
+      clearTimeout(pressTimer.current);
+    }
+  }}
+  onMouseDown={() => {
+  pressTimer.current = setTimeout(() => {
+    if ("vibrate" in navigator) {
+  navigator.vibrate(30);
+}
+    setReplyTo(msg);
+  }, 500);
+}}
+
+onMouseUp={() => {
+  if (pressTimer.current) {
+    clearTimeout(pressTimer.current);
+  }
+}}
+
+onMouseLeave={() => {
+  if (pressTimer.current) {
+    clearTimeout(pressTimer.current);
+  }
+}}
+>
         <div
           className={`max-w-[80%] rounded-xl p-3 shadow-sm ${
             isMe
@@ -374,6 +413,28 @@ localStorage.setItem(
        setShowEmoji(false);
       }}
     />
+  </div>
+)}
+
+{/* REPLY TO */}
+{replyTo && (
+  <div className="border-l-4 border-blue-500 bg-gray-100 p-2 mb-2 rounded">
+    <div className="font-semibold text-sm">
+      Replying to {replyTo.username}
+    </div>
+
+    <div className="text-sm text-gray-600 truncate">
+      {replyTo.text}
+    </div>
+
+    <button
+      onClick={() =>
+        setReplyTo(null)
+      }
+      className="text-red-500 text-xs"
+    >
+      Cancel
+    </button>
   </div>
 )}
 
