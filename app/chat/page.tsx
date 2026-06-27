@@ -9,6 +9,11 @@ type Message = {
   username: string;
   text: string;
   createdAt: string;
+
+  replyTo?: {
+    username: string;
+    text: string;
+  };
 };
 
 type User = {
@@ -181,9 +186,12 @@ localStorage.setItem(
     if (!text) return;
 
     socket.emit(
-      "send-message",
-      text
-    );
+  "send-message",
+  {
+    text,
+    replyTo,
+  }
+);
 
     setMessage("");
   }
@@ -386,6 +394,18 @@ onMouseLeave={() => {
               )}
             </span>
           </div>
+
+{msg.replyTo && (
+  <div className="border-l-2 border-gray-400 pl-2 mb-2 text-sm opacity-80">
+    <div>
+      {msg.replyTo.username}
+    </div>
+
+    <div>
+      {msg.replyTo.text}
+    </div>
+  </div>
+)}
 
   <p>{msg.text}</p>
         </div>
