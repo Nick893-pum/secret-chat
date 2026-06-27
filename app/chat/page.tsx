@@ -181,20 +181,15 @@ localStorage.setItem(
   // SEND MESSAGE
   // ==========================
   function sendMessage() {
-    const text = message.trim();
+  const text = message.trim();
 
-    if (!text) return;
+  if (!text) return;
 
-    socket.emit(
-  "send-message",
-  {
-    text,
-    replyTo,
-  }
-);
+  socket.emit("send-message", text);
 
-    setMessage("");
-  }
+  setMessage("");
+  setReplyTo(null);
+}
 
   // ==========================
   // LEAVE ROOM
